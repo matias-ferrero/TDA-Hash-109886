@@ -183,9 +183,20 @@ size_t hash_con_cada_clave(hash_t *hash,
 			   bool (*f)(const char *clave, void *valor, void *aux),
 			   void *aux)
 {
-	size_t n = 0;
+	size_t recorridos = 0;
 	if (!hash || !f)
-		return n;
+		return recorridos;
 
-	return n;
+	for (size_t i = 0; i < hash->capacidad; i++) {
+		nodo_t *nodo = hash->vector[i];
+		while (nodo) {
+			bool validar = f(nodo->clave, nodo->elemento, aux);
+			recorridos++;
+			if (!validar)
+				return recorridos;
+
+			nodo = nodo->siguiente;
+		}
+	}
+	return recorridos;
 }
