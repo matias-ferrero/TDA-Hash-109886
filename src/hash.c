@@ -52,6 +52,17 @@ nodo_t *crear_nodo(char *clave, void *elemento)
 	return nodo;
 }
 
+nodo_t *buscar_nodo_por_clave(nodo_t *nodo, char *clave)
+{
+	if (!nodo)
+		return NULL;
+
+	if (!strcmp(nodo->clave, clave))
+		return nodo;
+
+	return buscar_nodo_por_clave(nodo->siguiente, clave);
+}
+
 void rehash(hash_t *hash)
 {
 
@@ -88,6 +99,8 @@ void *hash_quitar(hash_t *hash, const char *clave)
 	if (!hash)
 		return NULL;
 
+	size_t posicion = funcion_hash(clave);
+	nodo_t *nodo = buscar_nodo_por_clave(hash->vector[posicion], clave);
 	return NULL;
 }
 
@@ -96,7 +109,9 @@ void *hash_obtener(hash_t *hash, const char *clave)
 	if (!hash)
 		return NULL;
 
-	return NULL;
+	size_t posicion = funcion_hash(clave);
+	nodo_t *nodo = buscar_nodo_por_clave(hash->vector[posicion], clave);
+	return nodo->elemento;
 }
 
 bool hash_contiene(hash_t *hash, const char *clave)
@@ -104,7 +119,9 @@ bool hash_contiene(hash_t *hash, const char *clave)
 	if (!hash)
 		return NULL;
 
-	return false;
+	size_t posicion = funcion_hash(clave);
+	nodo_t *nodo = buscar_nodo_por_clave(hash->vector[posicion], clave);
+	return nodo != NULL;
 }
 
 size_t hash_cantidad(hash_t *hash)
