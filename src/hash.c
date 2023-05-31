@@ -89,9 +89,29 @@ hash_t *hash_insertar(hash_t *hash, const char *clave, void *elemento,
 	if (!nodo)
 		return NULL;
 
+	nodo->siguiente = hash->vector[posicion];
 	hash->vector[posicion] = nodo;
+	hash->cantidad++;
 
 	return hash;
+}
+
+nodo_t *hash_quitar_nodo(hash_t *hash, nodo_t *nodo, char *clave,
+			 void **elemento)
+{
+	if (!nodo)
+		return NULL;
+
+	if (!strcmp(nodo->clave, clave)) {
+		*elemento = nodo->elemento;
+		nodo_t *aux = nodo->siguiente;
+		free(nodo);
+		hash->cantidad--;
+		return aux;
+	}
+
+	nodo->siguiente = hash_quitar_nodo(hash, nodo->siguiente, clave, elemento);
+	return nodo;
 }
 
 void *hash_quitar(hash_t *hash, const char *clave)
@@ -99,9 +119,11 @@ void *hash_quitar(hash_t *hash, const char *clave)
 	if (!hash)
 		return NULL;
 
+	void *elemento = NULL;
 	size_t posicion = funcion_hash(clave);
-	nodo_t *nodo = buscar_nodo_por_clave(hash->vector[posicion], clave);
-	return NULL;
+	hash->vector[posicion] = hash_quitar_nodo(hash, hash->vector[posicion],
+						  clave, &elemento);
+	return elemento;
 }
 
 void *hash_obtener(hash_t *hash, const char *clave)
@@ -142,6 +164,18 @@ void hash_destruir_todo(hash_t *hash, void (*destructor)(void *))
 	if (!hash)
 		return;
 
+	for (size_t i = 0; i < hash->capacidad; i++) {
+		nodo_t *nodo = hash->vector[i];
+		while (nodo) {			
+			nodo_t *aux = nodo->siguiente;
+			if (destructor != NULL)
+				destructor(nodo->elemento);
+
+			free(nodo);
+			hash->cantidad--;
+			nodo = aux;
+		}
+	}
 	free(hash);
 }
 
