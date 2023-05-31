@@ -17,6 +17,11 @@ struct hash {
 	nodo_t **vector;
 };
 
+size_t funcion_hash(char *clave)
+{
+
+}
+
 hash_t *hash_crear(size_t capacidad)
 {
 	hash_t *hash = malloc(sizeof(hash_t));
@@ -34,13 +39,48 @@ hash_t *hash_crear(size_t capacidad)
 	return hash;
 }
 
+nodo_t *crear_nodo(char *clave, void *elemento)
+{
+	nodo_t *nodo = malloc(sizeof(nodo_t));
+	if (!nodo)
+		return NULL;
+
+	nodo->clave = clave;
+	nodo->elemento = elemento;
+	nodo->siguiente = NULL;
+
+	return nodo;
+}
+
+void rehash(hash_t *hash)
+{
+
+}
+
 hash_t *hash_insertar(hash_t *hash, const char *clave, void *elemento,
 		      void **anterior)
 {
 	if (!hash || !clave)
 		return NULL;
 
-	return NULL;
+	size_t posicion = funcion_hash(clave);
+
+	nodo_t *nodo = hash->vector[posicion];
+	while (nodo != NULL) {
+		if (!strcmp(nodo->clave, clave)) {
+			nodo->elemento = elemento;
+			return hash;
+		}
+
+		nodo = nodo->siguiente;
+	}
+	nodo_t *nodo = crear_nodo(clave, elemento);
+	if (!nodo)
+		return NULL;
+
+	hash->vector[posicion] = nodo;
+
+	return hash;
 }
 
 void *hash_quitar(hash_t *hash, const char *clave)
@@ -71,7 +111,8 @@ size_t hash_cantidad(hash_t *hash)
 {
 	if (!hash)
 		return 0;
-	return 0;
+
+	return hash->cantidad;
 }
 
 void hash_destruir(hash_t *hash)
