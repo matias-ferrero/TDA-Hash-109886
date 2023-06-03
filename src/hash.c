@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "hash.h"
 
@@ -9,7 +10,7 @@
 typedef struct nodo {
 	const char *clave;
 	void *valor;
-	nodo_t *siguiente;
+	struct nodo *siguiente;
 } nodo_t;
 
 struct hash {
@@ -72,14 +73,14 @@ hash_t *hash_crear(size_t capacidad)
 	if (!hash)
 		return NULL;
 
+	if (capacidad < CAPACIDAD_MINIMA)
+		capacidad = CAPACIDAD_MINIMA;
+
 	hash->vector = calloc(capacidad, sizeof(nodo_t *));
 	if (!hash->vector) {
 		free(hash);
 		return NULL;
 	}
-
-	if (capacidad < CAPACIDAD_MINIMA)
-		capacidad = CAPACIDAD_MINIMA;
 
 	hash->capacidad = capacidad;
 	hash->cantidad = 0;
@@ -93,7 +94,7 @@ size_t funcion_hash(const char *clave)
 	int c;
 
 	while ((c = *clave++))
-		hash = ((hash << 5) + hash) + c;
+		hash = ((hash << 5) + hash) + (size_t)c;
 
 	return hash;
 }
@@ -117,9 +118,8 @@ hash_t *rehash(hash_t *hash)
 	if (!nuevo_hash)
 		return NULL;
 
-	size_t insertados = hash_con_cada_clave(hash,
-						insertar_nodo_en_nuevo_hash,
-						nuevo_hash);
+	size_t insertados = hash_con_cada_clave(
+		hash, insertar_nodo_en_nuevo_hash, nuevo_hash);
 	if (insertados != hash->cantidad) {
 		hash_destruir(nuevo_hash);
 		return NULL;
@@ -138,13 +138,16 @@ hash_t *hash_insertar(hash_t *hash, const char *clave, void *valor,
 	if (!hash || !clave)
 		return NULL;
 
-	if (hash->cantidad / hash->capacidad > FACTOR_CARGA_MAXIMO)
+	float factor_carga = (float)(hash->cantidad) / (float)(hash->capacidad);
+	printf("El factor de carga es: %f\n", factor_carga);
+	if (factor_carga > FACTOR_CARGA_MAXIMO)
 		hash = rehash(hash);
 
 	if (!hash)
 		return NULL;
 
 	size_t posicion = funcion_hash(clave) % hash->capacidad;
+	//printf("La posicion a insertar en el vector es: %zu\n", posicion);
 
 	nodo_t *nodo = hash->vector[posicion];
 	while (nodo != NULL) {
@@ -162,35 +165,47 @@ hash_t *hash_insertar(hash_t *hash, const char *clave, void *valor,
 		return NULL;
 
 	insertar_nodo(hash, posicion, nodo);
+
+	factor_carga = (float)(hash->cantidad) / (float)(hash->capacidad);
+	printf("El factor de carga es: %f\n", factor_carga);
+	if (factor_carga > FACTOR_CARGA_MAXIMO)
+		hash = rehash(hash);
+
+	if (!hash)
+		return NULL;
+
 	return hash;
 }
 
 void *hash_quitar(hash_t *hash, const char *clave)
 {
-	if (!hash)
+	if (!hash || !clave || !hash_cantidad(hash))
 		return NULL;
 
 	void *valor = NULL;
 	size_t posicion = funcion_hash(clave) % hash->capacidad;
-	hash->vector[posicion] = quitar_nodo(hash, hash->vector[posicion],
-					     clave, &valor);
+	hash->vector[posicion] =
+		quitar_nodo(hash, hash->vector[posicion], clave, &valor);
 	return valor;
 }
 
 void *hash_obtener(hash_t *hash, const char *clave)
 {
-	if (!hash)
+	if (!hash || !clave || !hash_cantidad(hash))
 		return NULL;
 
 	size_t posicion = funcion_hash(clave) % hash->capacidad;
 	nodo_t *nodo = buscar_nodo_por_clave(hash->vector[posicion], clave);
+	if (!nodo)
+		return NULL;
+
 	return nodo->valor;
 }
 
 bool hash_contiene(hash_t *hash, const char *clave)
 {
-	if (!hash)
-		return NULL;
+	if (!hash || !clave || !hash_cantidad(hash))
+		return false;
 
 	size_t posicion = funcion_hash(clave) % hash->capacidad;
 	nodo_t *nodo = buscar_nodo_por_clave(hash->vector[posicion], clave);
@@ -217,7 +232,7 @@ void hash_destruir_todo(hash_t *hash, void (*destructor)(void *))
 
 	for (size_t i = 0; i < hash->capacidad; i++) {
 		nodo_t *nodo = hash->vector[i];
-		while (nodo) {			
+		while (nodo) {
 			nodo_t *aux = nodo->siguiente;
 			if (destructor != NULL)
 				destructor(nodo->valor);
@@ -227,6 +242,7 @@ void hash_destruir_todo(hash_t *hash, void (*destructor)(void *))
 			nodo = aux;
 		}
 	}
+	free(hash->vector);
 	free(hash);
 }
 
@@ -235,7 +251,7 @@ size_t hash_con_cada_clave(hash_t *hash,
 			   void *aux)
 {
 	size_t recorridos = 0;
-	if (!hash || !f)
+	if (!hash || !f || !hash_cantidad(hash))
 		return recorridos;
 
 	for (size_t i = 0; i < hash->capacidad; i++) {
