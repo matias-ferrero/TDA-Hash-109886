@@ -140,6 +140,9 @@ void pruebas_quitar_y_destruir()
 	pa2m_afirmar(hash_quitar(hash, par[6].clave) == &par[6].valor,
 		     "Quitar un valor modificado devuelve el valor correcto");
 
+	pa2m_afirmar(!hash_quitar(hash, par[6].clave),
+		     "Quitar un valor ya quitado (no esta mas en el hash) devuelve NULL");
+
 	pa2m_afirmar(!hash_quitar(hash, "Clave_que_no_existe"),
 		     "No se puede quitar un valor que no se inserto");
 
@@ -195,9 +198,8 @@ void pruebas_buscar_valores_por_clave()
 	pa2m_afirmar(!hash_contiene(hash, "Clave_que_no_existe"),
 		     "No se puede encontrar un valor que no se inserto");
 
-	pa2m_afirmar(
-		!hash_obtener(hash, "Clave_que_no_existe"),
-		"No se puede obtener un valor que no se inserto y no se encontro");
+	pa2m_afirmar(!hash_obtener(hash, "Clave_que_no_existe"),
+		     "No se puede obtener un valor que no se inserto");
 
 	hash_quitar(hash, par[0].clave);
 	pa2m_afirmar(!hash_contiene(hash, par[0].clave),
@@ -212,6 +214,10 @@ void pruebas_buscar_valores_por_clave()
 void pruebas_insertar_y_rehashear()
 {
 	hash_t *hash = hash_crear(CAPACIDAD);
+	int numero[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+			 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+			 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
+			 31, 32, 33, 34, 35, 36, 37, 38, 39, 40 };
 	//par_t par[MAX_VECTOR];
 	//void *anterior = NULL;
 
@@ -220,25 +226,31 @@ void pruebas_insertar_y_rehashear()
 	for (i = 0; i < 34; i++) {
 		clave = (char)(i + 65);
 		printf("La clave es: %c\n", clave);
-		hash_insertar(hash, &clave, NULL, NULL);
+		hash_insertar(hash, &clave, &numero[i], NULL);
 		printf("i: %i\n\n\n\n", i);
 	}
 
 	clave = (char)(i + 65);
 	printf("La clave es: %c\n", clave);
-	hash_insertar(hash, &clave, NULL, NULL);
+	hash_insertar(hash, &clave, &numero[i], NULL);
+	printf("%i\n\n\n\n", i);
+
+	hash_con_cada_clave(hash, leer_valores, NULL);
 	printf("%i\n\n\n\n", i);
 
 	i++;
 	clave = (char)(i + 65);
 	printf("La clave es: %c\n", clave);
-	hash_insertar(hash, &clave, NULL, NULL);
+	hash_insertar(hash, &clave, &numero[i], NULL);
+	printf("%i\n\n\n\n", i);
+
+	hash_con_cada_clave(hash, leer_valores, NULL);
 	printf("%i\n\n\n\n", i);
 
 	i++;
 	clave = (char)(i + 65);
 	printf("La clave es: %c\n", clave);
-	hash_insertar(hash, &clave, NULL, NULL);
+	hash_insertar(hash, &clave, &numero[i], NULL);
 	printf("%i\n\n\n\n", i);
 
 	hash_destruir(hash);
@@ -287,16 +299,16 @@ void pruebas_de_operaciones_del_tda_hash()
 	//pruebas_de_creacion_y_destruccion_del_hash();
 
 	pa2m_nuevo_grupo("PRUEBAS DE INSERTAR VALORES Y DESTRUIR HASH");
-	//pruebas_insertar_y_destruir();
+	pruebas_insertar_y_destruir();
 
 	pa2m_nuevo_grupo("PRUEBAS DE QUITAR VALORES Y DESTRUIR HASH");
-	//pruebas_quitar_y_destruir();
+	pruebas_quitar_y_destruir();
 
 	pa2m_nuevo_grupo("PRUEBAS DE BUSCAR VALORES POR CLAVE");
-	//pruebas_buscar_valores_por_clave();
+	pruebas_buscar_valores_por_clave();
 
 	pa2m_nuevo_grupo("PRUEBAS DE INSERTAR Y REHASHEAR");
-	pruebas_insertar_y_rehashear();
+	//pruebas_insertar_y_rehashear();
 
 	pa2m_nuevo_grupo("PRUEBAS DEL ITERADOR INTERNO");
 	//pruebas_hash_iterador_interno();

@@ -8,7 +8,7 @@
 #define CAPACIDAD_MINIMA 3
 
 typedef struct nodo {
-	const char *clave;
+	char *clave;
 	void *valor;
 	struct nodo *siguiente;
 } nodo_t;
@@ -19,13 +19,23 @@ struct hash {
 	nodo_t **vector;
 };
 
+char *duplicar_clave(const char *clave)
+{
+	char *aux = malloc(strlen(clave) + 1);
+	if (!aux)
+		return NULL;
+
+	strcpy(aux, clave);
+	return aux;
+}
+
 nodo_t *crear_nodo(const char *clave, void *valor)
 {
 	nodo_t *nodo = malloc(sizeof(nodo_t));
 	if (!nodo)
 		return NULL;
 
-	nodo->clave = clave;
+	nodo->clave = duplicar_clave(clave);
 	nodo->valor = valor;
 	nodo->siguiente = NULL;
 
@@ -58,6 +68,7 @@ nodo_t *quitar_nodo(hash_t *hash, nodo_t *nodo, const char *clave, void **valor)
 	if (!strcmp(nodo->clave, clave)) {
 		*valor = nodo->valor;
 		nodo_t *aux = nodo->siguiente;
+		free(nodo->clave);
 		free(nodo);
 		hash->cantidad--;
 		return aux;
@@ -139,37 +150,49 @@ hash_t *hash_insertar(hash_t *hash, const char *clave, void *valor,
 		return NULL;
 
 	float factor_carga = (float)(hash->cantidad) / (float)(hash->capacidad);
-	printf("El factor de carga es: %f\n", factor_carga);
-	if (factor_carga > FACTOR_CARGA_MAXIMO)
+	//printf("El factor de carga es: %f\n", factor_carga);
+	if (factor_carga > FACTOR_CARGA_MAXIMO) {
+		//printf("Se ejecuta el rehash\n");
 		hash = rehash(hash);
+	}
 
 	if (!hash)
 		return NULL;
 
 	size_t posicion = funcion_hash(clave) % hash->capacidad;
-	//printf("La posicion a insertar en el vector es: %zu\n", posicion);
-
+	////printf("La posicion a insertar en el vector es: %zu\n", posicion);
 	nodo_t *nodo = hash->vector[posicion];
 	while (nodo != NULL) {
 		if (!strcmp(nodo->clave, clave)) {
-			*anterior = nodo->valor;
+			if (anterior != NULL)
+				*anterior = nodo->valor;
+
 			nodo->valor = valor;
 			return hash;
 		}
 
 		nodo = nodo->siguiente;
 	}
+	if (anterior != NULL)
+		*anterior = NULL;
 
 	nodo = crear_nodo(clave, valor);
 	if (!nodo)
 		return NULL;
 
 	insertar_nodo(hash, posicion, nodo);
+	/*
+	if (nodo->valor != NULL) {
+		int *valor_num = (int *)nodo->valor;
+		printf("El valor %i va en pos es: %zu\n", *valor_num, posicion);
+	}
 
-	factor_carga = (float)(hash->cantidad) / (float)(hash->capacidad);
-	printf("El factor de carga es: %f\n", factor_carga);
-	if (factor_carga > FACTOR_CARGA_MAXIMO)
+	factor_carga = (float)(hash->cantidad) / (float)(hash->capacidad);*/
+	//printf("El factor de carga es: %f\n", factor_carga);
+	if (factor_carga > FACTOR_CARGA_MAXIMO) {
+		//printf("Se ejecuta el rehash\n");
 		hash = rehash(hash);
+	}
 
 	if (!hash)
 		return NULL;
@@ -237,6 +260,7 @@ void hash_destruir_todo(hash_t *hash, void (*destructor)(void *))
 			if (destructor != NULL)
 				destructor(nodo->valor);
 
+			free(nodo->clave);
 			free(nodo);
 			hash->cantidad--;
 			nodo = aux;
