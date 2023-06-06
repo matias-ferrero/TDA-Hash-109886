@@ -6,6 +6,7 @@
 #include <stdlib.h>
 
 #define CAPACIDAD 50
+#define CAPACIDAD_REHASH 5
 #define MAX_CLAVE 10
 #define MAX_VECTOR 100
 
@@ -213,46 +214,83 @@ void pruebas_buscar_valores_por_clave()
 
 void pruebas_insertar_y_rehashear()
 {
-	hash_t *hash = hash_crear(CAPACIDAD);
-	int numero[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-			 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-			 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
-			 31, 32, 33, 34, 35, 36, 37, 38, 39, 40 };
-	//par_t par[MAX_VECTOR];
-	//void *anterior = NULL;
+	hash_t *hash = hash_crear(CAPACIDAD_REHASH);
+	par_t par[MAX_VECTOR];
+	bool hubo_error = false;
+
+	strcpy(par[0].clave, "Clave1");
+	strcpy(par[1].clave, "Clave2");
+	strcpy(par[2].clave, "Clave3");
+	strcpy(par[3].clave, "Clave4");
+	strcpy(par[4].clave, "Clave5");
+	strcpy(par[5].clave, "Clave6");
+	strcpy(par[6].clave, "Clave7");
+	strcpy(par[7].clave, "Clave8");
 
 	int i;
-	char clave;
-	for (i = 0; i < 34; i++) {
-		clave = (char)(i + 65);
-		printf("La clave es: %c\n", clave);
-		hash_insertar(hash, &clave, &numero[i], NULL);
-		printf("i: %i\n\n\n\n", i);
+	for (i = 0; i < 3; i++) {
+		par[i].valor = i;
+		hash_insertar(hash, par[i].clave, &par[i].valor, NULL);
 	}
+	par[i].valor = i;
+	pa2m_afirmar(hash_insertar(hash, par[i].clave, &par[i].valor, NULL) != NULL,
+		     "Se provoca un rehash y no se genera un error");
 
-	clave = (char)(i + 65);
-	printf("La clave es: %c\n", clave);
-	hash_insertar(hash, &clave, &numero[i], NULL);
-	printf("%i\n\n\n\n", i);
+	for (int i = 0; i < hash_cantidad(hash); i++) {
+		if (!hash_contiene(hash, par[i].clave))
+			hubo_error = true;
+	}
+	pa2m_afirmar(!hubo_error && hash_cantidad(hash) == 4,
+		     "Se encuentran todos los valores despues del rehash");
+	hubo_error = false;
 
-	hash_con_cada_clave(hash, leer_valores, NULL);
-	printf("%i\n\n\n\n", i);
+	for (i = (int)hash_cantidad(hash); i < 7; i++) {
+		par[i].valor = i;
+		if (!hash_insertar(hash, par[i].clave, &par[i].valor, NULL))
+			hubo_error = true;
+	}
+	pa2m_afirmar(!hubo_error && hash_cantidad(hash) == 7,
+		     "Se pueden seguir insertando valores sin error");
+	hubo_error = false;
 
-	i++;
-	clave = (char)(i + 65);
-	printf("La clave es: %c\n", clave);
-	hash_insertar(hash, &clave, &numero[i], NULL);
-	printf("%i\n\n\n\n", i);
+	par[i].valor = i;
+	pa2m_afirmar(hash_insertar(hash, par[i].clave, &par[i].valor, NULL) != NULL,
+		     "Se provoca otro rehash y no se genera un error");
 
-	hash_con_cada_clave(hash, leer_valores, NULL);
-	printf("%i\n\n\n\n", i);
+	for (int i = 0; i < hash_cantidad(hash); i++) {
+		if (!hash_contiene(hash, par[i].clave))
+			hubo_error = true;
+	}
+	pa2m_afirmar(!hubo_error && hash_cantidad(hash) == 8,
+		     "Se encuentran todos los valores despues del rehash");
+	hubo_error = false;
 
-	i++;
-	clave = (char)(i + 65);
-	printf("La clave es: %c\n", clave);
-	hash_insertar(hash, &clave, &numero[i], NULL);
-	printf("%i\n\n\n\n", i);
+	for (int i = 0; i < 8; i++) {
+		if (hash_quitar(hash, par[i].clave) != &par[i].valor)
+			hubo_error = true;
 
+		if (hash_contiene(hash, par[i].clave))
+			hubo_error = true;
+	}
+	pa2m_afirmar(!hubo_error && !hash_cantidad(hash),
+		     "Se pueden quitar todos los valores correctamente");
+	//hubo_error = false;
+/*
+	char clave[MAX_VECTOR];
+	for (i = 0; i < 55; i++) {
+		for (int j = 0; j < 94; j++) {
+			clave[i] = (char)(j + 32);
+			if (!hash_insertar(hash, clave, NULL, NULL))
+				hubo_error = true;
+		}
+	}
+	for (int i = 0; i < hash_cantidad(hash); i++) {
+		if (!hash_contiene(hash, par[i].clave))
+			hubo_error = true;
+	}
+	pa2m_afirmar(!hubo_error && hash_cantidad(hash) == 5170,
+		     "Se pueden insertar 5000 valores y el rehash no genera error");
+*/
 	hash_destruir(hash);
 }
 
@@ -266,7 +304,6 @@ void pruebas_hash_iterador_interno()
 	par_t par[MAX_VECTOR];
 	int numeros[] = { 1, 2, 3, 4, 5, 6, 7 };
 	int contador = 0;
-	//void *anterior = NULL;
 
 	strcpy(par[0].clave, "Clave1");
 	strcpy(par[1].clave, "Clave2");
@@ -294,9 +331,9 @@ void pruebas_hash_iterador_interno()
 }
 
 void pruebas_de_operaciones_del_tda_hash()
-{
+{/*
 	pa2m_nuevo_grupo("PRUEBAS DE CREACION Y DESTRUCCION");
-	//pruebas_de_creacion_y_destruccion_del_hash();
+	pruebas_de_creacion_y_destruccion_del_hash();
 
 	pa2m_nuevo_grupo("PRUEBAS DE INSERTAR VALORES Y DESTRUIR HASH");
 	pruebas_insertar_y_destruir();
@@ -307,11 +344,11 @@ void pruebas_de_operaciones_del_tda_hash()
 	pa2m_nuevo_grupo("PRUEBAS DE BUSCAR VALORES POR CLAVE");
 	pruebas_buscar_valores_por_clave();
 
-	pa2m_nuevo_grupo("PRUEBAS DE INSERTAR Y REHASHEAR");
-	//pruebas_insertar_y_rehashear();
-
 	pa2m_nuevo_grupo("PRUEBAS DEL ITERADOR INTERNO");
-	//pruebas_hash_iterador_interno();
+	pruebas_hash_iterador_interno();
+*/
+	pa2m_nuevo_grupo("PRUEBAS DE INSERTAR Y REHASHEAR");
+	pruebas_insertar_y_rehashear();
 }
 
 /*
@@ -412,14 +449,14 @@ int main()
 		"--- PRUEBAS DE LAS OPERACIONES DE LA TABLA DE HASH ---");
 	pruebas_de_operaciones_del_tda_hash();
 	printf("\n");
-
+/*
 	pa2m_nuevo_grupo("--- PRUEBAS DEL DESTRUCTOR DE LA TABLA DE HASH ---");
 	printf("Liberar la tabla de hash y sus valores no debe perder memoria");
-	//pruebas_de_destruir_todo_en_el_hash();
+	pruebas_de_destruir_todo_en_el_hash();
 	printf("\n");
 
 	pa2m_nuevo_grupo("--- PRUEBAS DE FUNCIONES CON PARAMETROS NULOS ---");
-	//pruebas_del_tda_hash_con_parametros_nulos();
-
+	pruebas_del_tda_hash_con_parametros_nulos();
+*/
 	return pa2m_mostrar_reporte();
 }

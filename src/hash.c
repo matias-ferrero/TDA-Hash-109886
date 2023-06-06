@@ -150,17 +150,17 @@ hash_t *hash_insertar(hash_t *hash, const char *clave, void *valor,
 		return NULL;
 
 	float factor_carga = (float)(hash->cantidad) / (float)(hash->capacidad);
-	//printf("El factor de carga es: %f\n", factor_carga);
-	if (factor_carga > FACTOR_CARGA_MAXIMO) {
-		//printf("Se ejecuta el rehash\n");
+	//printf("Factor de carga: %f\n", factor_carga);
+	if (factor_carga > FACTOR_CARGA_MAXIMO)
 		hash = rehash(hash);
-	}
+
+	factor_carga = (float)(hash->cantidad) / (float)(hash->capacidad);
+	//printf("Factor de carga: %f\n", factor_carga);
 
 	if (!hash)
 		return NULL;
 
 	size_t posicion = funcion_hash(clave) % hash->capacidad;
-	////printf("La posicion a insertar en el vector es: %zu\n", posicion);
 	nodo_t *nodo = hash->vector[posicion];
 	while (nodo != NULL) {
 		if (!strcmp(nodo->clave, clave)) {
@@ -170,7 +170,6 @@ hash_t *hash_insertar(hash_t *hash, const char *clave, void *valor,
 			nodo->valor = valor;
 			return hash;
 		}
-
 		nodo = nodo->siguiente;
 	}
 	if (anterior != NULL)
@@ -181,19 +180,14 @@ hash_t *hash_insertar(hash_t *hash, const char *clave, void *valor,
 		return NULL;
 
 	insertar_nodo(hash, posicion, nodo);
-	/*
-	if (nodo->valor != NULL) {
-		int *valor_num = (int *)nodo->valor;
-		printf("El valor %i va en pos es: %zu\n", *valor_num, posicion);
-	}
 
-	factor_carga = (float)(hash->cantidad) / (float)(hash->capacidad);*/
-	//printf("El factor de carga es: %f\n", factor_carga);
-	if (factor_carga > FACTOR_CARGA_MAXIMO) {
-		//printf("Se ejecuta el rehash\n");
+	factor_carga = (float)(hash->cantidad) / (float)(hash->capacidad);
+	//printf("Factor de carga: %f\n", factor_carga);
+	if (factor_carga > FACTOR_CARGA_MAXIMO)
 		hash = rehash(hash);
-	}
 
+	factor_carga = (float)(hash->cantidad) / (float)(hash->capacidad);
+	//printf("Factor de carga: %f\n", factor_carga);
 	if (!hash)
 		return NULL;
 
