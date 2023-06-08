@@ -274,9 +274,10 @@ void pruebas_insertar_y_rehashear()
 	}
 	pa2m_afirmar(!hubo_error && !hash_cantidad(hash),
 		     "Se pueden quitar todos los valores correctamente");
-	//hubo_error = false;
+	hubo_error = false;
 
 	char clave[MAX_VECTOR];
+	memset(clave, 0 , MAX_VECTOR);
 	for (i = 0; i < 55; i++) {
 		for (int j = 0; j < 94; j++) {
 			clave[i] = (char)(j + 32);
@@ -284,12 +285,23 @@ void pruebas_insertar_y_rehashear()
 				hubo_error = true;
 		}
 	}
-	for (int i = 0; i < hash_cantidad(hash); i++) {
-		if (!hash_contiene(hash, par[i].clave))
-			hubo_error = true;
-	}
+
 	pa2m_afirmar(!hubo_error && hash_cantidad(hash) == 5170,
 		     "Se pueden insertar 5000 valores y el rehash no genera error");
+	hubo_error = false;
+
+	memset(clave, 0 , MAX_VECTOR);
+	for (i = 0; i < 55; i++) {
+		for (int j = 0; j < 94; j++) {
+			clave[i] = (char)(j + 32);
+			if (!hash_contiene(hash, clave))
+				hubo_error = true;
+		}
+	}
+
+	pa2m_afirmar(!hubo_error,
+		     "Se pueden encontrar los 5000 valores insertados");
+	hubo_error = false;
 
 	hash_destruir(hash);
 }
