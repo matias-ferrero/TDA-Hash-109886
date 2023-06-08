@@ -6,31 +6,28 @@
 
 ## Repositorio de (Nombre Apellido) - (Padrón) - (Mail)
 
-- Para compilar:
+- Para compilar y correr pruebas locales con makefile:
 
-```bash
-línea de compilación
+```
+make
 ```
 
-- Para ejecutar:
+- Para compilar y correr ejemplo con makefile:
 
-```bash
-línea de ejecución
+```
+make valgrind-ejemplo
 ```
 
-- Para ejecutar con valgrind:
-```bash
-línea con valgrind
+- Para compilar y correr pruebas de la catedra con makefile:
+
+```
+make valgrind-chanutron
 ```
 ---
 ##  Funcionamiento
 
-Explicación de cómo funcionan las estructuras desarrolladas en el TP y el funcionamiento general del mismo.
-
-Aclarar en esta parte todas las decisiones que se tomaron al realizar el TP, cosas que no se aclaren en el enunciado, fragmentos de código que necesiten explicación extra, etc.
-
-Incluír **EN TODOS LOS TPS** los diagramas relevantes al problema (mayormente diagramas de memoria para explicar las estructuras, pero se pueden utilizar otros diagramas si es necesario).
-
+Este programa implementa el TDA Hash, o tabla de Hash, con su iterador interno. El programa recibe los datos necesarios que entrega el usuario (claves, valores, funciones, etc.), y realiza las operaciones válidas del TDA. Particularmente, al crear el TDA, recibe un numero entero positivo que va a ser la capacidad inicial de la tabla. En caso de exceder esa capacidad, el Hash se encarga de agrandar esa capacidad para mantener funcional a la tabla, operacion que vamos a llamar "rehashear".
+Por otro lado, para las demás operaciones reciben claves que están emparejadas con el valor que representan, con lo que el TDA maneja únicamente las claves mediante una función, la cual vamos a llamar función de Hash.
 ### Por ejemplo:
 
 El programa funciona abriendo el archivo pasado como parámetro y leyendolo línea por línea. Por cada línea crea un registro e intenta agregarlo al vector. La función de lectura intenta leer todo el archivo o hasta encontrar el primer error. Devuelve un vector con todos los registros creados.
@@ -57,4 +54,9 @@ vector_original = vector;
 ---
 
 ## Respuestas a las preguntas teóricas
-Incluír acá las respuestas a las preguntas del enunciado (si aplica).
+
+1. Qué es un diccionario
+
+3. Qué es una función de hash y qué características debe tener
+
+4. Qué es una tabla de Hash y sus diferentes métodos de resolución de colisiones 

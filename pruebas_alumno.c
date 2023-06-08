@@ -275,7 +275,7 @@ void pruebas_insertar_y_rehashear()
 	pa2m_afirmar(!hubo_error && !hash_cantidad(hash),
 		     "Se pueden quitar todos los valores correctamente");
 	//hubo_error = false;
-/*
+
 	char clave[MAX_VECTOR];
 	for (i = 0; i < 55; i++) {
 		for (int j = 0; j < 94; j++) {
@@ -290,7 +290,7 @@ void pruebas_insertar_y_rehashear()
 	}
 	pa2m_afirmar(!hubo_error && hash_cantidad(hash) == 5170,
 		     "Se pueden insertar 5000 valores y el rehash no genera error");
-*/
+
 	hash_destruir(hash);
 }
 
