@@ -343,7 +343,7 @@ void pruebas_hash_iterador_interno()
 }
 
 void pruebas_de_operaciones_del_tda_hash()
-{/*
+{
 	pa2m_nuevo_grupo("PRUEBAS DE CREACION Y DESTRUCCION");
 	pruebas_de_creacion_y_destruccion_del_hash();
 
@@ -358,7 +358,7 @@ void pruebas_de_operaciones_del_tda_hash()
 
 	pa2m_nuevo_grupo("PRUEBAS DEL ITERADOR INTERNO");
 	pruebas_hash_iterador_interno();
-*/
+
 	pa2m_nuevo_grupo("PRUEBAS DE INSERTAR Y REHASHEAR");
 	pruebas_insertar_y_rehashear();
 }
@@ -461,7 +461,7 @@ int main()
 		"--- PRUEBAS DE LAS OPERACIONES DE LA TABLA DE HASH ---");
 	pruebas_de_operaciones_del_tda_hash();
 	printf("\n");
-/*
+
 	pa2m_nuevo_grupo("--- PRUEBAS DEL DESTRUCTOR DE LA TABLA DE HASH ---");
 	printf("Liberar la tabla de hash y sus valores no debe perder memoria");
 	pruebas_de_destruir_todo_en_el_hash();
@@ -469,6 +469,6 @@ int main()
 
 	pa2m_nuevo_grupo("--- PRUEBAS DE FUNCIONES CON PARAMETROS NULOS ---");
 	pruebas_del_tda_hash_con_parametros_nulos();
-*/
+
 	return pa2m_mostrar_reporte();
 }

@@ -150,12 +150,8 @@ hash_t *hash_insertar(hash_t *hash, const char *clave, void *valor,
 		return NULL;
 
 	float factor_carga = (float)(hash->cantidad) / (float)(hash->capacidad);
-	//printf("Factor de carga: %f\n", factor_carga);
 	if (factor_carga > FACTOR_CARGA_MAXIMO)
 		hash = rehash(hash);
-
-	factor_carga = (float)(hash->cantidad) / (float)(hash->capacidad);
-	//printf("Factor de carga: %f\n", factor_carga);
 
 	if (!hash)
 		return NULL;
@@ -182,12 +178,9 @@ hash_t *hash_insertar(hash_t *hash, const char *clave, void *valor,
 	insertar_nodo(hash, posicion, nodo);
 
 	factor_carga = (float)(hash->cantidad) / (float)(hash->capacidad);
-	//printf("Factor de carga: %f\n", factor_carga);
 	if (factor_carga > FACTOR_CARGA_MAXIMO)
 		hash = rehash(hash);
 
-	factor_carga = (float)(hash->cantidad) / (float)(hash->capacidad);
-	//printf("Factor de carga: %f\n", factor_carga);
 	if (!hash)
 		return NULL;
 
