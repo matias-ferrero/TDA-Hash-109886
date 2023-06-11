@@ -67,6 +67,79 @@ return  hash;
 size_t posicion = funcion_hash(clave) % hash->capacidad;
 ```
 
+Por último, para esta implementación de la función de rehash, se copian los nodos y se insertan en un nuevo Hash con doble capacidad que el anterior. Para copiar e insertar cada nodo, se utiliza el iterador interno del TDA que ya recorre todos los nodos del Hash original, pasando por parámetro a la función del iterador, una función booleana que copia e inserta los nodos. Esto implica reservar memoria para todas las copias mediante `malloc`, y liberar los originales mediante `free`, lo cual no es ideal considerando que se pueden reajustar los punteros a los nodos, sin necesidad de pedir más memoria.
+Teniendo esto en cuenta, esta es otra función de rehash (donde `hash_con_cada_clave` es la función del iterador interno), que reajusta los punteros de los nodos y no reserva memoria extra:
+
+```c
+typedef struct aux {
+	hash_t *hash;
+	nodo_t **vector_nuevo;
+} aux_t;
+
+void  insertar_nodo(hash_t *hash, size_t  posicion, nodo_t *nodo)
+{
+	nodo->siguiente = hash->vector[posicion];
+	hash->vector[posicion] = nodo;
+	hash->cantidad++;
+}
+
+nodo_t *buscar_nodo_por_clave(nodo_t *nodo, const  char *clave)
+{
+	if (!nodo)
+		return  NULL;
+
+	if (!strcmp(nodo->clave, clave))
+		return  nodo
+
+	return  buscar_nodo_por_clave(nodo->siguiente, clave);
+}
+
+bool insertar_nodo_en_nuevo_vector(const char *clave, void *valor,
+								   void *auxiliar)
+{
+	valor = valor;
+	aux_t *aux = auxiliar;
+	hash_t *hash = aux->hash;
+
+	size_t posicion = funcion_hash(clave) % hash->capacidad;
+	nodo_t *nodo = buscar_nodo_por_clave(hash->vector[posicion], clave);
+	if (!nodo)
+		return false;
+
+	insertar_nodo(hash, posicion, nodo);
+	return true;
+}
+
+hash_t *nuevo_rehash(hash_t *hash)
+{
+	aux_t *aux = malloc(sizeof(aux_t));
+	if (!aux)
+		return NULL;
+
+	aux->hash = hash;
+	aux->vector_nuevo = calloc(hash->capacidad * 2, sizeof(nodo_t *));
+	if (!aux->vector_nuevo)
+		return NULL;
+
+	size_t insertados = hash_con_cada_clave(hash, insertar_nodo_en_nuevo_vector, aux);
+	if (insertados != hash->cantidad) {
+		free(aux->vector_nuevo);
+		return NULL;
+	}
+
+	free(hash->vector);
+
+	hash->capacidad *= 2;
+	hash->vector = aux->vector_nuevo;
+
+	free(aux);
+
+	return hash;
+}
+```
+
+Esta función no es parte a la implementación final ya que tiene errores, y no se pudieron solucionar sin reutilizar el iterador interno. En caso de solucionar estos errores y comprobar que funcione correctamente, esta función de rehash puede reemplazar la implementada actualmente.
+
 ## Respuestas a las preguntas teóricas
 
 1. Qué es un diccionario:

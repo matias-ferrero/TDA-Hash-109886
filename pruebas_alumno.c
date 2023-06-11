@@ -287,7 +287,7 @@ void pruebas_insertar_y_rehashear()
 	}
 
 	pa2m_afirmar(!hubo_error && hash_cantidad(hash) == 5170,
-		     "Se pueden insertar 5000 valores y el rehash no genera error");
+		     "Se pueden insertar 5170 valores y el rehash no genera error");
 	hubo_error = false;
 
 	memset(clave, 0 , MAX_VECTOR);
@@ -300,7 +300,7 @@ void pruebas_insertar_y_rehashear()
 	}
 
 	pa2m_afirmar(!hubo_error,
-		     "Se pueden encontrar los 5000 valores insertados");
+		     "Se pueden encontrar los 5170 valores insertados");
 	hubo_error = false;
 
 	hash_destruir(hash);
