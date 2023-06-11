@@ -141,8 +141,9 @@ void pruebas_quitar_y_destruir()
 	pa2m_afirmar(hash_quitar(hash, par[6].clave) == &par[6].valor,
 		     "Quitar un valor modificado devuelve el valor correcto");
 
-	pa2m_afirmar(!hash_quitar(hash, par[6].clave),
-		     "Quitar un valor ya quitado (no esta mas en el hash) devuelve NULL");
+	pa2m_afirmar(
+		!hash_quitar(hash, par[6].clave),
+		"Quitar un valor ya quitado (no esta mas en el hash) devuelve NULL");
 
 	pa2m_afirmar(!hash_quitar(hash, "Clave_que_no_existe"),
 		     "No se puede quitar un valor que no se inserto");
@@ -233,7 +234,8 @@ void pruebas_insertar_y_rehashear()
 		hash_insertar(hash, par[i].clave, &par[i].valor, NULL);
 	}
 	par[i].valor = i;
-	pa2m_afirmar(hash_insertar(hash, par[i].clave, &par[i].valor, NULL) != NULL,
+	pa2m_afirmar(hash_insertar(hash, par[i].clave, &par[i].valor, NULL) !=
+			     NULL,
 		     "Se provoca un rehash y no se genera un error");
 
 	for (int i = 0; i < hash_cantidad(hash); i++) {
@@ -254,7 +256,8 @@ void pruebas_insertar_y_rehashear()
 	hubo_error = false;
 
 	par[i].valor = i;
-	pa2m_afirmar(hash_insertar(hash, par[i].clave, &par[i].valor, NULL) != NULL,
+	pa2m_afirmar(hash_insertar(hash, par[i].clave, &par[i].valor, NULL) !=
+			     NULL,
 		     "Se provoca otro rehash y no se genera un error");
 
 	for (int i = 0; i < hash_cantidad(hash); i++) {
@@ -277,7 +280,7 @@ void pruebas_insertar_y_rehashear()
 	hubo_error = false;
 
 	char clave[MAX_VECTOR];
-	memset(clave, 0 , MAX_VECTOR);
+	memset(clave, 0, MAX_VECTOR);
 	for (i = 0; i < 55; i++) {
 		for (int j = 0; j < 94; j++) {
 			clave[i] = (char)(j + 32);
@@ -286,11 +289,12 @@ void pruebas_insertar_y_rehashear()
 		}
 	}
 
-	pa2m_afirmar(!hubo_error && hash_cantidad(hash) == 5170,
-		     "Se pueden insertar 5170 valores y el rehash no genera error");
+	pa2m_afirmar(
+		!hubo_error && hash_cantidad(hash) == 5170,
+		"Se pueden insertar 5170 valores y el rehash no genera error");
 	hubo_error = false;
 
-	memset(clave, 0 , MAX_VECTOR);
+	memset(clave, 0, MAX_VECTOR);
 	for (i = 0; i < 55; i++) {
 		for (int j = 0; j < 94; j++) {
 			clave[i] = (char)(j + 32);
